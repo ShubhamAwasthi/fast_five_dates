@@ -1,0 +1,25 @@
+{
+  "name": "fast_five_dates",
+  "version": "1.0.0",
+  "description": "This app allows users to chat to 5 strangers for 5 minutes, no personal information will be saved",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ShubhamAwasthi/fast_five_dates.git"
+  },
+  "keywords": [
+    "chat",
+    "socket",
+    "node",
+    "express"
+  ],
+  "author": "Shubham Awasthi",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/ShubhamAwasthi/fast_five_dates/issues"
+  },
+  "homepage": "https://github.com/ShubhamAwasthi/fast_five_dates#readme"
+}
