@@ -5,6 +5,7 @@ app.get('/', function(req, res){
   res.send('<h1>Hello world</h1>');
 });
 
-http.listen(3000, function(){
-  console.log('listening on *:3000');
+
+app.listen(process.env.PORT || 4000, function(){
+    console.log('Your node js server is running');
 });
