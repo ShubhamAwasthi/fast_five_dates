@@ -1,38 +1,184 @@
 <!doctype html>
 <html>
-  <head>
-    <title>Socket.IO chat</title>
-    <style>
-      * { margin: 0; padding: 0; box-sizing: border-box; }
-      body { font: 13px Helvetica, Arial; }
-      form { background: #000; padding: 3px; position: fixed; bottom: 0; width: 100%; }
-      form input { border: 0; padding: 10px; width: 90%; margin-right: .5%; }
-      form button { width: 9%; background: rgb(130, 224, 255); border: none; padding: 10px; }
-      #messages { list-style-type: none; margin: 0; padding: 0; }
-      #messages li { padding: 5px 10px; }
-      #messages li:nth-child(odd) { background: #eee; }
+
+<head>
+  <title>Fast Five Dates</title>
+  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.2.1/css/bootstrap.min.css" integrity="sha384-GJzZqFGwb1QTTN6wy59ffF1BuGJpLSa9DkKMp0DgiMDm4iYMj70gZWKYbI706tWS"
+    crossorigin="anonymous">
+  <style>
+    .active-user{
+      height: 10px;
+      width: 10px;
+      background-color: #0F0;
+      border-radius: 50%;
+      display: inline-block;
+    }
+    .inactive-user{
+      height: 10px;
+      width: 10px;
+      background-color: #bbb;
+      border-radius: 50%;
+      display: inline-block;
+    }
+    .users-messages{
+      margin-left: 1px;
+    }
+    .users-box ,
+    .message-box{
+      padding: 0px;
+      background: lemonchiffon;
+    }
+    .users-box li:first-child,
+    .message-box li:first-child{
+      background: #007bff;
+      color: #fff;
+    }
+    .message-form{
+      padding-right:0px;
+    }
     </style>
-  </head>
-  <body>
-    <ul id="messages"></ul>
-    <form action="">
-      <input id="m" autocomplete="off" /><button>Send</button>
-    </form>
-	<script src="/socket.io/socket.io.js"></script>
-	<script src="https://code.jquery.com/jquery-1.11.1.js"></script>
-<script>
-  $(function () {
-    var socket = io();
-    $('form').submit(function(e){
-      e.preventDefault(); 
-      socket.emit('chat message', $('#m').val());
-      $('#m').val('');
-      return false;
+</head>
+
+<body>
+  <div class="modal fade" id="preferencesModal" tabindex="-1" role="dialog" aria-labelledby="preferencesModalLabel"
+    aria-hidden="true">
+    <div class="modal-dialog" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="preferencesModalLabel">Little bit?</h5>
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+        <div class="modal-body">
+          <form class="custom-form" id="submitPreferences">
+            <h6 class="modal-text">You are?</h5>
+              <input class="form-control" type="text" placeholder="choose any nickname" id="userName">
+              <hr>
+              <div class="custom-control custom-radio">
+                <input type="radio" id="M" name="customRadio" class="custom-control-input" checked>
+                <label class="custom-control-label" for="M">Male</label>
+              </div>
+              <div class="custom-control custom-radio">
+                <input type="radio" id="F" name="customRadio" class="custom-control-input">
+                <label class="custom-control-label" for="F">Female</label>
+              </div>
+              <hr>
+              <h6 class="modal-text">You like?</h5>
+                <div class="custom-control custom-switch">
+                  <input type="checkbox" class="custom-control-input" id="attribute-1">
+                  <label class="custom-control-label" for="attribute-1">Sports</label>
+                </div>
+                <div class="custom-control custom-switch">
+                  <input type="checkbox" class="custom-control-input" id="attribute-2">
+                  <label class="custom-control-label" for="attribute-2">TV Series</label>
+                </div>
+                <div class="custom-control custom-switch">
+                  <input type="checkbox" class="custom-control-input" id="attribute-3">
+                  <label class="custom-control-label" for="attribute-3">Food</label>
+                </div>
+                <div class="custom-control custom-switch">
+                  <input type="checkbox" class="custom-control-input" id="attribute-4">
+                  <label class="custom-control-label" for="attribute-4">Travel</label>
+                </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+          <input type="submit" class="btn btn-primary" id="updatePreferences" value="Continue"></input>
+        </div>
+      </div>
+      </form>
+    </div>
+  </div>
+  <div class="container">
+    <div class="row users-messages">
+      <ul id="users" class="list-group col-md-3 users-box">
+        <li class="list-group-item">Users</li>
+      </ul>
+      <ul id="messages" class="list-group col-md-9 message-box">
+        <li class="list-group-item">Chat Window</li>
+      </ul>
+    </div>
+  </div>
+  <div class="container">
+      <div class="row">
+          <form action="" id="messageForm" class="custom-form col-md-12 message-form">
+            <div class="container">
+              <div class="row">
+                <input id="m" autocomplete="off" class="form-control col-md-9" />
+                <button class="btn btn-primary col-md-3">Send</button>
+              </div>
+            </div>
+          </form>
+        </div>
+  </div>
+
+  <script src="/socket.io/socket.io.js"></script>
+  <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo"
+    crossorigin="anonymous"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.6/umd/popper.min.js" integrity="sha384-wHAiFfRlMFy6i5SRaxvfOCifBUQy1xHdJ/yoi7FRNXMRBu5WHdZYu1hA6ZOblgut"
+    crossorigin="anonymous"></script>
+  <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.2.1/js/bootstrap.min.js" integrity="sha384-B0UglyR+jN6CkvvICOB2joaf5I4l3gm9GU6Hc1og6Ls7i6U/mkkaduKaBhlAXv9k"
+    crossorigin="anonymous"></script>
+  <script>
+    //Show the preferences  modal
+    $(function () {
+      $('#preferencesModal').modal('show');
     });
-	  socket.on('chat message', (msg)=>{
-	  	$('#messages').append('<li>'+msg+'</li>');
-	  });
-  });
-</script>
-  </body>
+
+    //This starts the socket connection to the client
+    $(function () {
+      var socket = io();
+      //we will save the user id in cookie so that if he refreshed the page he is not added twice.
+      var idPair = document.cookie.split(';').filter(x => x.startsWith('id='));
+      var id = '';
+      var sameUser = false;
+      if (idPair.length != 0) {
+        id = idPair[0].split('=')[1];
+        sameUser = true;
+      }
+      if (id == '') {
+        id = '' + (new Date()).getTime();
+        document.cookie = 'id=' + id;
+      }
+
+      socket.emit('user joins', { id: id });
+      $('#messageForm').submit(function (e) {
+        e.preventDefault();
+        socket.emit('chat message', { id: id, message: $('#m').val() });
+        $('#m').val('');
+        return false;
+      });
+      //send the preferences for this user
+      $('#submitPreferences').submit(function (e) {
+        e.preventDefault();
+        socket.emit('preferences', { id: id, userName: $('#userName')[0].value || 'Johny', gender: $('#submitPreferences input[type=radio]:checked')[0].id, attributes: $('#submitPreferences input[type=checkbox]:checked').map((x, y) => y.id).get() });
+        $('#preferencesModal').modal('hide');
+      })
+      socket.on('chat message', (msg) => {
+        $('#messages').append('<li class="list-group-item">' + msg.userName + (msg.id == id ? '(me)' : '') + ': ' + msg.message + '</li>');
+        $('.message-form')[0].scrollIntoView()
+      });
+      socket.on('user joins', (msg) => {
+        //unless the user's data is not there do not add for the same id again.
+        if ($('anonymous_' + msg.id).length == 0) {
+          $('#users').append('<li id="anonymous_' + msg.id + '" class="list-group-item">' + (msg.userName || 'Johny') + ' <span class="active-user"/>' + (msg.id == id ? '(me)' : '') + '</li>');
+        }
+        //When user goes away
+        $(window).on('unload', function () {
+          console.log('user left', { id: id });
+          socket.emit('user left', { id: id });
+        });
+      });
+      socket.on('user left', (msg) => {
+        console.log('user left', msg);
+        $('#anonymous_' + msg.id).hide();
+      });
+      socket.on('update user', (msg) => {
+        console.log('update user', msg);
+        $('#anonymous_' + msg.id).html((msg.userName || 'Johny') + ' <span class="active-user" />' + (msg.id == id ? '(me)' : ''));
+      });
+    });
+  </script>
+</body>
 </html>
